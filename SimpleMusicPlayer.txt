@@ -1,0 +1,53 @@
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.advanced.AdvancedPlayer;
+
+import java.io.FileInputStream;
+import java.util.Scanner;
+
+public class SimpleMusicPlayer {
+    private AdvancedPlayer player;
+
+    public void play(String audioFilePath) {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(audioFilePath);
+            player = new AdvancedPlayer(fileInputStream);
+
+            new Thread(() -> {
+                try {
+                    player.play();
+                } catch (JavaLayerException e) {
+                    System.out.println("Error playing audio: " + e.getMessage());
+                }
+            }).start();
+
+            System.out.println("Playing: " + audioFilePath);
+        } catch (Exception e) {
+            System.out.println("Error playing audio: " + e.getMessage());
+        }
+    }
+
+    public void stop() {
+        if (player != null) {
+            player.close();
+            System.out.println("Music stopped");
+        }
+    }
+
+    public static void main(String[] args) {
+        SimpleMusicPlayer musicPlayer = new SimpleMusicPlayer();
+
+        System.out.println("Enter the path of the MP3 file: ");
+        Scanner scanner = new Scanner(System.in);
+        String audioFilePath = scanner.nextLine();
+
+        musicPlayer.play(audioFilePath);
+
+        System.out.println("Press 's' and Enter to stop the music.");
+        String input = scanner.nextLine();
+
+        if (input.equalsIgnoreCase("s")) {
+            musicPlayer.stop();
+        }
+        scanner.close();
+    }
+}
